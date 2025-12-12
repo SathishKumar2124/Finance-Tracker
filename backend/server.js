@@ -6,9 +6,6 @@ import userRouter from "./routes/userRoutes.js";
 import postRouter from "./routes/postRoutes.js";
 
 
-const data = ["one" , "two" , "three"];
-
-
 
 dotenv.config();
 const port = process.env.PORT;

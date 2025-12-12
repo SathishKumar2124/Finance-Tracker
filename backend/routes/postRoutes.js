@@ -1,5 +1,5 @@
 import express from "express";
-import validateToken from "../middlewares/AuthMiddleware.js";
+import validateToken from "../middlewares/AuthMiddleware.js"; 
 
 const postRouter = express.Router();
 
@@ -20,7 +20,10 @@ postRouter.get('/',validateToken,(req,res)=> {
          {
             id : 4,
             title : "post 4"
-        },
+        },{
+            id : 5,
+            title : "post 5"
+        }
     ])
 })
 
