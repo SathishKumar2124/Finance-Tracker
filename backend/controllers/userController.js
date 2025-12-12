@@ -45,13 +45,18 @@ const login = async(req,res) => {
             return res.status(403).json({msg : "password is incorrect !!!" , success : false});
         }
 
+
+
         const jwtToken = jwt.sign({email : isUserExists.email , _id : isUserExists._id}, process.env.secret_key,{expiresIn : '24h'});
+
+        const id = isUserExists._id;
 
         res.status(200).json({
             msg : "login success",
             success : true,
             jwtToken,
-            email, 
+            email,
+            id
         })
 
     } catch (error) {

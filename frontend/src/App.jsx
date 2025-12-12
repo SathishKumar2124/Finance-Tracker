@@ -3,6 +3,10 @@ import {Navigate, Route, Routes} from 'react-router-dom'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import Home from './pages/Home'
+import { ToastContainer } from 'react-toastify'
+import ProtectedRoutes from './ProtectedRoutes'
+import PageNotFound from './pages/PageNotFound'
+
 
 const App = () => {
   return (
@@ -11,11 +15,14 @@ const App = () => {
       <div className='uppercase tracking-widest font-extrabold text-md md:text-3xl'>finance Tracker</div>
       </div>
       <Routes>
-        <Route path='/' element={<Navigate to="/login" />} />
+        <Route element={<ProtectedRoutes />}>
+              <Route path='/' element={ <Home /> } />
+        </Route>
         <Route path='/signup' element={<SignUp />} />
         <Route path='/login' element={<Login />} />
-        <Route path='/home' element={<Home />} />
+        <Route path='*' element={<PageNotFound />} />
       </Routes>
+      <ToastContainer autoClose={1500} />
     </div>
   )
 }
