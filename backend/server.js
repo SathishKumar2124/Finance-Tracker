@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDb from "./db.js";
 import userRouter from "./routes/userRoutes.js";
-import postRouter from "./routes/postRoutes.js";
+import recordRouter from "./routes/recordRoutes.js";
 
 
 
@@ -16,7 +16,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/auth',userRouter);
-app.use('/posts',postRouter)
+app.use('/records',recordRouter);
 
 
 connectDb();

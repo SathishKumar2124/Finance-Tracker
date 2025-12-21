@@ -10,12 +10,20 @@ const Home = () => {
   const [amount,setAmount] = useState("");
   const [category,setCategory] = useState("");
   const [payMethod,setPayMethod] = useState("");
+  const [records,setRecords] = useState([]);
 
-  
+  const getRecord = async(userId) => {
+     const url = `http://localhost:3001/records/all-record/:${userId}`;
+      const res = await api.get(url);
+      console.log(res.data);
+  }
+
   const navigate = useNavigate();
   useEffect(()=>{
     setUser(localStorage.getItem('email'));
     setUserId(localStorage.getItem('userid'));
+    const allRecords = getRecord(userId);
+    setRecords(allRecords);
   },[]);
 
   const handleLogout = () => {
@@ -27,6 +35,37 @@ const Home = () => {
     },2000);
   }
 
+
+
+  const addNewRecord = async(newRecord) => {
+
+    try {
+      const url = "http://localhost:3001/records/new-record"
+      const res = await api.post(url,newRecord);
+        if(res.data.success){
+          toast.success(res.data.msg);
+        }else{
+          toast.error(res.data.msg || "something went wrong!!")
+        }
+    } catch (error) {
+            if(error.response){
+                console.log("server error",error.response.data);
+                toast.error(error.response.data.msg || "server error!!!")
+            }else if(error.request){
+                console.log("network error " , error.request);
+                toast.error("network error");
+            }else{
+                console.log("error :" , error.message);
+                toast.error("unexpected error");
+            }   
+    }
+
+    setDescription("");
+    setAmount("");
+    setCategory("");
+    setPayMethod("");
+
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,14 +79,11 @@ const Home = () => {
       payMethod
     }
 
-    //backend method call
 
-    // setDescription("");
-    // setAmount("");
-    // setCategory("");
-    // setPayMethod("");
+    addNewRecord(newRecord);
+    
 
-    console.log(newRecord)
+ 
 
   }
 
@@ -97,6 +133,7 @@ const Home = () => {
                 </div>
             </form>
         </div>
+
     </div>
   )
 }
