@@ -12,25 +12,42 @@ const Home = () => {
   const [payMethod,setPayMethod] = useState("");
   const [records,setRecords] = useState([]);
 
-  const getRecord = async(userId) => {
-     const url = `http://localhost:3001/records/all-record/:${userId}`;
-      const res = await api.get(url);
-      console.log(res.data);
-  }
+  
 
   const navigate = useNavigate();
   useEffect(()=>{
     setUser(localStorage.getItem('email'));
     setUserId(localStorage.getItem('userid'));
-    const allRecords = getRecord(userId);
-    setRecords(allRecords);
   },[]);
+
+
+  
+
+  const getRecord = async() => {
+    try {
+      const res = await api.get(`/records/all-record/${userId}`);
+      const sortedRecord = res.data;
+      sortedRecord.sort((a,b) => new Date(b.date) - new Date(a.date) );
+      setRecords(sortedRecord);
+    } catch (error) {
+      console.error("axios error : ",error.response.data || error.message);
+    }   
+  }
+
+
+
+  useEffect(() => {
+    if(userId){
+      getRecord();
+    }
+  },[userId])
+  
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('email');
     toast.success('user Logout succesfull.');
-    setTimeout(() => {
+    setTimeout(() => {  
         navigate('/login')
     },2000);
   }
@@ -40,9 +57,10 @@ const Home = () => {
   const addNewRecord = async(newRecord) => {
 
     try {
-      const url = "http://localhost:3001/records/new-record"
+      const url = "/records/new-record"
       const res = await api.post(url,newRecord);
         if(res.data.success){
+
           toast.success(res.data.msg);
         }else{
           toast.error(res.data.msg || "something went wrong!!")
@@ -67,6 +85,8 @@ const Home = () => {
 
   }
 
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -82,7 +102,7 @@ const Home = () => {
 
     addNewRecord(newRecord);
     
-
+    location.reload();
  
 
   }
@@ -123,9 +143,9 @@ const Home = () => {
                   <label  className='font-semibold uppercase tracking-wider'>Pay method</label>
                   <select required className='border w-56 h-8  focus:outline-none ' onChange={(e) => setPayMethod(e.target.value)} value={payMethod}>
                       <option value="">Select a method</option>
-                      <option value="Food">Cash</option>
-                      <option value="Rent">Card</option>
-                      <option value="Salary">Upi</option>
+                      <option value="Cash">Cash</option>
+                      <option value="Card">Card</option>
+                      <option value="Upi">Upi</option>
                   </select>
                 </div>
                 <div className='flex justify-center items-center my-3 p-2'>
@@ -133,7 +153,26 @@ const Home = () => {
                 </div>
             </form>
         </div>
+        <div className='mt-5 p-7 w-full'>
+          {
+          records.length ==  0 ?  <div> no record found !!! </div> :  
+            <div>
+              {
+                records.map((r) => ( 
+                  <div key={r._id} className='w-full flex  justify-around items-center space-x-3 mt-3 mb-3 bg-gray-400 p-4' > 
+                      <input type="text"  className='border border-black p-2 w-40 outline:none' value={r.description} />
+                      <input type="text"  className='border border-black p-2 w-40 utline:none' value={r.amount} />
+                      <input type="text"  className='border border-black p-2 w-40 utline:none' value={r.date} />
+                      <input type="text"  className='border border-black p-2 w-40 utline:none' value={r.category} />
+                      <input type="text"  className='border border-black p-2 w-40 utline:none' value={r.payMethod} /> 
+                      <button className='bg-red-500 text-white h-5 w-10'>Del</button>
+                  </div>
+                ) )
+              }
+            </div>
+          }
 
+        </div>
     </div>
   )
 }
