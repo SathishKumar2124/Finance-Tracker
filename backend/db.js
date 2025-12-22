@@ -10,4 +10,4 @@ const connectDb = () => {
     }
 }
 
-export default connectDb;
+export default connectDb; 
