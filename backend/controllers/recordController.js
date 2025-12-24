@@ -5,7 +5,7 @@ import recordModel from "../models/financeRecord.js";
 const allRecordById = async(req,res) => {
     try {
         const userId = req.params.userId;
-        const  records = await recordModel.find({userId : userId});
+        const  records = await recordModel.find({userId : userId}).sort({date : -1}).limit(10);
         if(records.length == 0){
             return res.status(404).json({msg : "no record found" , success : true});
         }
@@ -88,7 +88,25 @@ const deleteRecord = async(req,res) => {
     }
 };
 
+const getRecordById = async(req,res) => {
+    const id = req.params.recordId;
+    try {
+        const record = await recordModel.findOne({_id : id});
+        if(!record){
+            return res.status(404).json({msg : "no record found!!!" , success : false});
+        };
+        res.status(200).json(record)
+    } catch (error) {
+         return res.status(500).json({
+            msg :   error.message || "something went wrong!!!",
+            success : false
+        });
+    }
+    
+
+}
 
 
 
-export { allRecordById , postRecord ,updateRecord , deleteRecord};
+
+export { allRecordById , postRecord ,updateRecord , deleteRecord , getRecordById};
