@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import api from '../AxiosInstance';
+import {RiDeleteBin6Fill} from "react-icons/ri"
+import {FiEdit} from "react-icons/fi"
+
 
 const Home = () => {
   const [user,setUser] = useState('');
@@ -26,9 +29,9 @@ const Home = () => {
   const getRecord = async() => {
     try {
       const res = await api.get(`/records/all-record/${userId}`);
-      const sortedRecord = res.data;
-      sortedRecord.sort((a,b) => new Date(b.date) - new Date(a.date) );
-      setRecords(sortedRecord);
+      // const sortedRecord = res.data;
+      // sortedRecord.sort((a,b) => new Date(b.date) - new Date(a.date) );
+      setRecords(res.data);
     } catch (error) {
       console.error("axios error : ",error.response.data || error.message);
     }   
@@ -60,8 +63,12 @@ const Home = () => {
       const url = "/records/new-record"
       const res = await api.post(url,newRecord);
         if(res.data.success){
-
+          
           toast.success(res.data.msg);
+          setTimeout(() => {
+            location.reload()
+          },1000)
+          
         }else{
           toast.error(res.data.msg || "something went wrong!!")
         }
@@ -160,12 +167,13 @@ const Home = () => {
               {
                 records.map((r) => ( 
                   <div key={r._id} className='w-full flex  justify-around items-center space-x-3 mt-3 mb-3 bg-gray-400 p-4' > 
-                      <input type="text"  className='border border-black p-2 w-40 outline:none' value={r.description} />
-                      <input type="text"  className='border border-black p-2 w-40 utline:none' value={r.amount} />
-                      <input type="text"  className='border border-black p-2 w-40 utline:none' value={r.date} />
-                      <input type="text"  className='border border-black p-2 w-40 utline:none' value={r.category} />
-                      <input type="text"  className='border border-black p-2 w-40 utline:none' value={r.payMethod} /> 
-                      <button className='bg-red-500 text-white h-5 w-10'>Del</button>
+                      <div type="text"  className='border border-black p-2 w-40 flex justify-center items-center ' >{r.description} </div>
+                     <div type="text"  className='border border-black p-2 w-40 flex justify-center items-center ' >{r.amount} </div>
+                      <div type="text"  className='border border-black p-2 w-40 flex justify-center items-center ' >{r.category} </div>
+                     <div type="text"  className='border border-black p-2 w-40 flex justify-center items-center ' >{r.payMethod} </div>
+                    <div type="text"  className='border border-black p-2 w-40 flex justify-center items-center ' >{new Date(r.date).toISOString().split('T')[0]} </div>
+                    <button className=' text-yellow-600 text-2xl border border-black h-10 w-10 flex justify-center items-center rounded-full bg-gray-500 hover:text-yellow-600 cursor-pointer  '><FiEdit /></button>
+                      <button className=' text-red-500 text-2xl border border-black h-10 w-10 flex justify-center items-center rounded-full hover:bg-gray-500 hover:text-red-600 cursor-pointer  '><RiDeleteBin6Fill /></button>
                   </div>
                 ) )
               }
