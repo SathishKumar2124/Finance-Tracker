@@ -42,8 +42,15 @@ const postRecord = async(req,res) => {
 const updateRecord = async(req,res) => {
     try {
         const recordId = req.params.recordId;
-        const newRecord = req.body;
-        const newRecordSave = await  recordModel.findByIdAndUpdate({_id : recordId,newRecord});
+        const {description , amount , category , payMethod} = req.body;
+        const newRecordSave = await  recordModel.findByIdAndUpdate({_id : recordId},{
+            $set : {
+                description,
+                amount,
+                category,
+                payMethod
+            }
+        });
 
         if(!newRecordSave) return res.status(404).json({ 
             msg :   "no record found!!!",
