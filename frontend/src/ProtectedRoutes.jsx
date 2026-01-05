@@ -6,6 +6,7 @@ const ProtectedRoutes = () => {
 
     if(!token){ 
       localStorage.clear("email");
+      localStorage.clear("userid");
         return <Navigate to="/login" replace />
     }
 

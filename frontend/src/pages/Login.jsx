@@ -25,13 +25,14 @@ const Login = () => {
         const url = "http://localhost:3001/auth/login"
         const res = await axios.post(url,loginInfo);
         if(res.data.success){
-          toast.success(res.data.msg);
+          toast.success(res.data.msg , { autoClose : 1000});
           localStorage.setItem("token",res.data.jwtToken);
           localStorage.setItem("email",res.data.email);
           localStorage.setItem("userid",res.data.id);
           setTimeout(()=> {
             navigate('/');
-          },2000)
+          },1200)
+          
         }else{
           toast.error(res.data.msg || "something went wrong!!")
         }
@@ -71,7 +72,7 @@ const Login = () => {
           </div>
 
         </form>
-        <ToastContainer autoClose={1500} />
+        <ToastContainer autoClose={1000} />
     </div>
   )
 }

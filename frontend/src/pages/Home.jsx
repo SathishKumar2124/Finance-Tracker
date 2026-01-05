@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 import api from '../AxiosInstance';
 import {RiDeleteBin6Fill} from "react-icons/ri"
 import {FiEdit} from "react-icons/fi"
@@ -18,6 +18,7 @@ const Home = () => {
   
 
   const navigate = useNavigate();
+
   useEffect(()=>{
     setUser(localStorage.getItem('email'));
     setUserId(localStorage.getItem('userid'));
@@ -49,10 +50,11 @@ const Home = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('email');
+    localStorage.removeItem("userid")
     toast.success('user Logout succesfull.');
     setTimeout(() => {  
         navigate('/login')
-    },2000);
+    },1000);
   }
 
 
@@ -63,12 +65,9 @@ const Home = () => {
       const url = "/records/new-record"
       const res = await api.post(url,newRecord);
         if(res.data.success){
-          
+          setRecords(prev => [newRecord,...prev]);
           toast.success(res.data.msg);
-          setTimeout(() => {
-            location.reload()
-          },1000)
-          
+          getRecord()
         }else{
           toast.error(res.data.msg || "something went wrong!!")
         }
@@ -106,12 +105,25 @@ const Home = () => {
       payMethod
     }
 
-
     addNewRecord(newRecord);
     
-    location.reload();
- 
+  }
 
+
+  const handleDelete = async(id) => {
+    try {
+      const url = `/records/delete-record/${id}`
+      const res = await api.delete(url);
+      console.log(res.data)
+      if(res.data.success){
+        setRecords(prev => prev.filter((r) => r._id !== id ))
+        toast.success(res.data.msg);
+      }else{
+        toast.error(res.data.msg)
+      }
+    } catch (error) {
+      toast.error(res.data.msg || error.response?.data?.message || "Unable to elete!!!")
+    }
   }
 
   return (
@@ -121,7 +133,7 @@ const Home = () => {
           <p className='font-semibold'>your email : {user}</p>
           <p className='font-semibold'>user id : {userId}</p>
         </div>
-          <button onClick={handleLogout} className='bg-red-500 h-12 w-24 rounded-3xl text-white uppercase tracking-wider font-bold'>Logout</button>
+          <button onClick={handleLogout} className='bg-red-500 h-12 w-24 rounded-3xl text-white uppercase tracking-wider font-bold cursor-pointer'>Logout</button>
         </div>
         <div className='flex flex-col justify-center items-center space-y-4 '>
           <p className='text-xl font-semibold underline'>Add a Record</p>
@@ -132,7 +144,7 @@ const Home = () => {
                 </div>
                 <div className='flex justify-between items-center space-x-4'>
                   <label  className='font-semibold uppercase tracking-wider'>Amount</label>
-                  <input type="number" className='border border-black focus:outline-none focus:border-blue-400 p-2' placeholder='enter the description' onChange={(e) => setAmount(e.target.value)} value={amount} required/>
+                  <input type="number" className='border border-black focus:outline-none focus:border-blue-400 p-2' placeholder='enter the amount' onChange={(e) => setAmount(e.target.value)} value={amount} required/>
                 </div>
                 <div className='flex justify-between items-center space-x-4'>
                   <label  className='font-semibold uppercase tracking-wider'>category</label>
@@ -160,7 +172,8 @@ const Home = () => {
                 </div>
             </form>
         </div>
-        <div className='mt-5 p-7 w-full'>
+        <div className='p-7 w-full'>
+          <div className='text-xl font-semibold capitalize text-center'>recent records</div>
           {
           records.length ==  0 ?  <div> no record found !!! </div> :  
             <div>
@@ -172,8 +185,8 @@ const Home = () => {
                       <div type="text"  className='border border-black p-2 w-40 flex justify-center items-center ' >{r.category} </div>
                      <div type="text"  className='border border-black p-2 w-40 flex justify-center items-center ' >{r.payMethod} </div>
                     <div type="text"  className='border border-black p-2 w-40 flex justify-center items-center ' >{new Date(r.date).toISOString().split('T')[0]} </div>
-                    <button className=' text-yellow-600 text-2xl border border-black h-10 w-10 flex justify-center items-center rounded-full bg-gray-500 hover:text-yellow-600 cursor-pointer  '><FiEdit /></button>
-                      <button className=' text-red-500 text-2xl border border-black h-10 w-10 flex justify-center items-center rounded-full hover:bg-gray-500 hover:text-red-600 cursor-pointer  '><RiDeleteBin6Fill /></button>
+                    <button className=' text-black text-2xl border border-black h-10 w-10 flex justify-center items-center rounded-full  hover:text-yellow-600 cursor-pointer  '><Link to={`/edit-record/${r._id}`} ><FiEdit /></Link></button>
+                      <button className=' text-red-500 text-2xl border border-black h-10 w-10 flex justify-center items-center rounded-full hover:bg-gray-500 hover:text-red-600 cursor-pointer  ' onClick={() => handleDelete(r._id)} ><RiDeleteBin6Fill /></button>
                   </div>
                 ) )
               }
@@ -181,6 +194,7 @@ const Home = () => {
           }
 
         </div>
+        <ToastContainer autoClose={1000} />
     </div>
   )
 }

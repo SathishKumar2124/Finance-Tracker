@@ -68,7 +68,7 @@ const SignUp = () => {
           </div>
         
         </form>
-          <ToastContainer />
+          <ToastContainer autoClose={1000}/>
     </div>
   )
 }
