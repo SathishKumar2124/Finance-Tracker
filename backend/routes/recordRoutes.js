@@ -1,12 +1,15 @@
 import express from "express";
 import validateToken from "../middlewares/AuthMiddleware.js"
-import { allRecordById, postRecord , updateRecord , deleteRecord, getRecordById} from "../controllers/recordController.js";
+import { allRecordById, postRecord , updateRecord , deleteRecord, getRecordById , getMonthTotal , getYearTotal} from "../controllers/recordController.js";
 
 const recordRouter = express.Router();
 
 
 recordRouter.get("/all-record/:userId",validateToken,allRecordById);
 recordRouter.get("/record/:recordId",validateToken,getRecordById);
+recordRouter.get("/month-total",validateToken,getMonthTotal)
+recordRouter.get("/year-total",validateToken,getYearTotal)
+
 
 
 recordRouter.post("/new-record",validateToken,postRecord);

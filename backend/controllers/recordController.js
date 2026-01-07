@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import recordModel from "../models/financeRecord.js";
 
 
@@ -113,7 +114,107 @@ const getRecordById = async(req,res) => {
 
 }
 
+const startOfMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    1,
+    0,0,0,0
+);
+
+const endOfMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth() + 1,
+    0,
+    23,59,59,999
+);
+
+const startOfYear = new Date(
+    new Date().getFullYear(),
+    0,
+    1,
+    0,0,0,0
+);
+
+const endOfYear = new Date(
+    new Date().getFullYear(),
+    11,
+    31,
+    23,59,59,999
+);
 
 
+const getMonthTotal = async(req,res) => {
+    const userId = req.user._id;
+   try {
+     const result = await recordModel.aggregate([
+        {
+            $match : {
+                userId : userId,
+                date : {
+                    $gte : startOfMonth,
+                    $lte : endOfMonth
+                }
+            }
+        },
+        {
+            $group : {
+                _id : null,
+                totalAmount : { 
+                    $sum : "$amount"
+                }
+            }
+        }
+    ]);
 
-export { allRecordById , postRecord ,updateRecord , deleteRecord , getRecordById};
+    res.status(200).json({
+        success : true,
+        total : result[0]?.totalAmount || 0
+    })
+
+   } catch (error) {
+    res.status(500).json({
+        success : false,
+        msg  : "unable to calculate data" 
+    })
+   }
+
+ }
+
+const getYearTotal = async(req,res) => {
+    const userId = req.user._id;
+   try {
+     const result = await recordModel.aggregate([
+        {
+            $match : {
+                userId : userId,
+                date : {
+                    $gte : startOfYear,
+                    $lte : endOfYear
+                }
+            }
+        },
+        {
+            $group : {
+                _id : null,
+                totalAmount : { 
+                    $sum : "$amount"
+                }
+            }
+        }
+    ]);
+
+    res.status(200).json({
+        success : true,
+        total : result[0]?.totalAmount || 0
+    })
+
+   } catch (error) {
+    res.status(500).json({
+        success : false,
+        msg  : "unable to calculate data" 
+    })
+   }
+
+ }
+
+export { allRecordById , postRecord ,updateRecord , deleteRecord , getRecordById , getMonthTotal , getYearTotal};
