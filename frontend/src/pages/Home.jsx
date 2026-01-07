@@ -14,6 +14,8 @@ const Home = () => {
   const [category,setCategory] = useState("");
   const [payMethod,setPayMethod] = useState("");
   const [records,setRecords] = useState([]);
+  const [yearTotal,setyearTotal] = useState();
+  const [monthTotal,setMonthTotal] = useState();
 
   
 
@@ -40,11 +42,44 @@ const Home = () => {
 
 
 
+
+  const getYearTotal = async() => {
+    try {
+      const res = await api.get('records/year-total');
+  if(res.data.success){
+    setyearTotal(res.data.total);
+  }else{
+    toast.error(res.data.msg)
+  }
+    } catch (error) {
+      toast.error("unable to fetch year total")
+    }
+  }
+
+   const getMonthTotal = async() => {
+    try {
+      const res = await api.get('records/year-total');
+  if(res.data.success){
+    setMonthTotal(res.data.total);
+  }else{
+    toast.error(res.data.msg)
+  }
+    } catch (error) {
+      toast.error("unable to fetch year total")
+    }
+  }
+
   useEffect(() => {
     if(userId){
       getRecord();
+      getYearTotal();
+      getMonthTotal();
     }
   },[userId])
+  
+
+  
+
   
 
   const handleLogout = () => {
@@ -171,6 +206,12 @@ const Home = () => {
                   <input type="submit" value="Add Record" className='bg-blue-400 w-full h-9 rounded-md uppercase tracking-wider font-semibold text-slate-800 cursor-pointer hover:bg-blue-600' />
                 </div>
             </form>
+        </div>
+        <div className='my-3  '>
+          <div>
+            <p className='font-semibold text-lg'> This Month Expense Total : {yearTotal} </p>
+            <p className='font-semibold text-lg'> This Year Expense Total : {monthTotal}</p>
+          </div>
         </div>
         <div className='p-7 w-full'>
           <div className='text-xl font-semibold capitalize text-center'>recent records</div>
